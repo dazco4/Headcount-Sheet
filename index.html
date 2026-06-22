@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoeGo GTM Headcount & Cost</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:#1a1a1a;background:#f5f5f5}
+:root{--or:#FF6B35;--od:#E55A25;--ol:#FFF0EB;--g100:#F5F5F5;--g200:#EBEBEB;--g300:#D4D4D4;--g400:#A8A8A8;--g600:#666;--g800:#333;--green:#1A7A4A;--green-bg:#E8F5EE;--red:#C0392B;--red-bg:#FDECEA;--amber:#B45309;--amber-bg:#FEF3C7;--blue:#1A56A4;--blue-bg:#EBF2FC;--purple:#6B21A8;--purple-bg:#F3E8FF;}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:#f1f1f1}::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+#app{display:flex;flex-direction:column;height:100vh}
+#header{height:52px;background:#1a1a1a;display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0}
+.logo{width:30px;height:30px;border-radius:7px;background:var(--or);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
+.h-title{color:#fff;font-weight:600;font-size:14px}.h-sub{color:#888;font-size:12px}.h-spacer{flex:1}
+#tab-bar{background:#fff;border-bottom:2px solid var(--g200);display:flex;align-items:flex-end;padding:0 20px;gap:0;overflow-x:auto;flex-shrink:0}
+.tab{padding:10px 14px;font-size:12px;font-weight:500;color:var(--g600);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;font-family:inherit}
+.tab:hover{color:var(--or)}.tab.active{color:var(--or);border-bottom-color:var(--or);font-weight:600}
+#main{flex:1;overflow:auto;padding:20px}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.page-title{font-size:20px;font-weight:600;letter-spacing:-0.3px}.page-sub{font-size:11px;color:var(--g600);margin-top:2px}
+.btn{padding:6px 13px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid transparent;font-family:inherit;white-space:nowrap}
+.btn-primary{background:var(--or);color:#fff;font-weight:600;border-color:var(--or)}.btn-primary:hover{background:var(--od)}
+.btn-primary:disabled{background:var(--g300);color:var(--g400);border-color:var(--g300);cursor:not-allowed}
+.btn-secondary{background:#fff;border-color:var(--g200);color:var(--g600)}.btn-secondary:hover{background:var(--g100)}
+.btn-sm{padding:4px 9px;font-size:11px}
+.btn-ghost{background:none;border:none;color:var(--g400);cursor:pointer;font-size:11px;padding:2px 5px;border-radius:3px;font-family:inherit}
+.btn-ghost:hover{color:var(--or);background:var(--ol)}
+.btn-danger{background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;padding:2px 5px;font-family:inherit}
+.btn-refresh{background:none;border:1px solid var(--g300);color:var(--g600);cursor:pointer;font-size:11px;padding:4px 10px;border-radius:6px;font-family:inherit}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px}
+.stat{background:#fff;border:1px solid var(--g200);border-radius:10px;padding:14px 16px;border-top-width:3px}
+.stat-lbl{font-size:10px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:5px}
+.stat-val{font-size:20px;font-weight:600;font-family:monospace;letter-spacing:-0.5px}.stat-sub{font-size:10px;color:var(--g400);margin-top:3px}
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:18px}
+.panel{background:#fff;border:1px solid var(--g200);border-radius:10px;padding:16px}
+.panel-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.panel-ttl{font-size:11px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:0.7px}
+.panel-tot{font-size:15px;font-weight:600;font-family:monospace}
+.bar-item{margin-bottom:7px}.bar-row{display:flex;justify-content:space-between;margin-bottom:2px}
+.bar-lbl{font-size:11px;color:var(--g600)}.bar-val{font-size:11px;font-family:monospace;color:var(--g800)}
+.bar-track{height:3px;background:var(--g200);border-radius:2px}.bar-fill{height:3px;border-radius:2px}
+.panel-foot{margin-top:10px;padding-top:10px;border-top:1px solid var(--g200);display:flex;justify-content:space-between;font-size:11px}
+.card{background:#fff;border:1px solid var(--g200);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.card-hdr{padding:11px 16px;border-bottom:1px solid var(--g200);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.card-ttl{font-size:12px;font-weight:600}.card-note{font-size:10px;color:var(--g400)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{padding:8px 10px;text-align:left;font-weight:600;color:var(--g400);font-size:10px;text-transform:uppercase;letter-spacing:0.6px;border-bottom:1px solid var(--g200);background:#fafafa;white-space:nowrap}
+thead th.r{text-align:right}thead th.c{text-align:center}
+tbody td{padding:7px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+tbody td.r{text-align:right}tbody td.c{text-align:center}
+tbody tr:nth-child(even) td{background:#fafafa}tbody tr:hover td{background:#FFF5F0!important}
+tfoot td{padding:9px 10px;font-weight:600;border-top:2px solid var(--g200);background:#f5f5f5;font-size:12px}tfoot td.r{text-align:right}
+.badge{display:inline-block;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;white-space:nowrap}
+.bg-good{background:var(--green-bg);color:var(--green)}.bg-poor{background:var(--red-bg);color:var(--red)}
+.bg-neutral{background:var(--g100);color:var(--g600)}.bg-orange{background:var(--ol);color:var(--od)}
+.bg-blue{background:var(--blue-bg);color:var(--blue)}.bg-amber{background:var(--amber-bg);color:var(--amber)}
+.bg-red{background:var(--red-bg);color:var(--red)}.bg-green{background:var(--green-bg);color:var(--green)}
+.bg-purple{background:var(--purple-bg);color:var(--purple)}
+.avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.emp-cell{display:flex;align-items:center;gap:7px}.emp-name{font-weight:500;font-size:12px}
+.emp-leave{font-size:9px;color:var(--amber);font-weight:600;text-transform:uppercase}
+.locked-cell{filter:blur(4px);user-select:none;pointer-events:none;color:var(--g400)}
+.unlock-bar{display:flex;align-items:center;gap:8px;background:var(--amber-bg);border:1px solid #e5c96a;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--amber);flex-wrap:wrap}
+.unlock-bar input{padding:4px 8px;border:1px solid #e5c96a;border-radius:5px;font-size:12px;outline:none;background:#fff;font-family:inherit;width:130px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:600px;max-height:92vh;overflow:auto;box-shadow:0 24px 64px rgba(0,0,0,0.18);display:flex;flex-direction:column}
+.modal-sm{max-width:400px}
+.modal-hdr{padding:15px 20px;border-bottom:1px solid var(--g200);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;position:sticky;top:0;background:#fff;z-index:1}
+.modal-ttl{font-size:15px;font-weight:600}.modal-x{border:none;background:none;font-size:20px;cursor:pointer;color:var(--g400);line-height:1;padding:0}
+.modal-body{padding:18px 20px;display:flex;flex-direction:column;gap:11px;overflow:auto;flex:1}
+.modal-foot{padding:11px 20px;border-top:1px solid var(--g200);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;position:sticky;bottom:0;background:#fff}
+.fg{display:flex;flex-direction:column;gap:3px}.flbl{font-size:10px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:0.6px}
+.frow{display:grid;gap:9px}.f2{grid-template-columns:1fr 1fr}.f3{grid-template-columns:1fr 1fr 1fr}
+input[type=text],input[type=number],input[type=date],input[type=password],select,textarea{padding:7px 9px;border:1px solid var(--g200);border-radius:6px;font-size:12px;outline:none;background:#fff;width:100%;font-family:inherit;color:#1a1a1a}
+input:focus,select:focus,textarea:focus{border-color:var(--or)}textarea{resize:vertical}
+input[type=checkbox]{accent-color:var(--or);width:13px;height:13px;cursor:pointer}
+.chk-lbl{display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer}
+.sec-hdr{font-size:10px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:0.7px;border-top:1px solid var(--g200);padding-top:11px;margin-top:2px}
+.team-tag{display:inline-flex;align-items:center;gap:3px;background:var(--ol);color:var(--od);border-radius:4px;padding:2px 7px;font-size:10px;font-weight:500;margin:2px}
+.team-tag .rm{border:none;background:none;color:var(--od);cursor:pointer;padding:0;font-size:11px;line-height:1}
+.tag-chip{display:inline-flex;align-items:center;gap:4px;background:var(--g100);border:1px solid var(--g200);border-radius:20px;padding:3px 10px;font-size:11px;margin:3px}
+.tag-chip .rm{border:none;background:none;color:var(--g400);cursor:pointer;padding:0;font-size:13px;line-height:1}.tag-chip .rm:hover{color:var(--red)}
+.w-status{font-size:11px;font-family:monospace;font-weight:600}
+.settings-section{background:#fff;border:1px solid var(--g200);border-radius:10px;padding:14px;margin-bottom:12px}
+.settings-title{font-size:11px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.controls input,.controls select{padding:6px 10px;border:1px solid var(--g200);border-radius:6px;font-size:12px;outline:none;background:#fff;font-family:inherit}
+.search-inp{flex:1;min-width:160px}
+.cac-section{background:#fff;border:1px solid var(--g200);border-radius:10px;padding:16px;margin-bottom:14px}
+.cac-title{font-size:12px;font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.inputs-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.iw{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--g200);border-radius:7px;padding:6px 12px;white-space:nowrap}
+.iw-lbl{font-size:11px;color:var(--g600);font-weight:500}
+.iw-val{font-family:monospace;font-size:13px;font-weight:600;color:var(--or);background:none;border:none;cursor:pointer;padding:0}
+.iw-inp{width:90px;border:1px solid var(--or);border-radius:4px;padding:2px 6px;font-size:13px;outline:none;font-family:monospace}
+.pb-good{color:var(--green);font-weight:600}.pb-ok{color:var(--amber);font-weight:600}.pb-bad{color:var(--red);font-weight:600}
+.risk-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:11px}
+.risk-row:last-child{border-bottom:none}
+.leader-chip{display:inline-flex;align-items:center;gap:5px;background:var(--g100);border:1px solid var(--g200);border-radius:6px;padding:5px 10px;font-size:12px;margin:3px}
+.leader-chip .rm-leader{border:none;background:none;color:var(--red);cursor:pointer;padding:0;font-size:14px;line-height:1;margin-left:2px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div class="logo">M</div>
+    <span class="h-title">MoeGo</span>
+    <span class="h-sub">GTM Headcount &amp; Cost</span>
+    <div class="h-spacer"></div>
+    <button class="btn-refresh" onclick="refreshApp()">&#8635; Refresh</button>
+    <button class="btn btn-secondary btn-sm" onclick="importData()" style="margin-left:6px">&#8679; Import</button>
+    <button class="btn btn-secondary btn-sm" onclick="exportData()">&#8681; Export</button>
+    <button class="btn btn-secondary btn-sm" onclick="promptAdmin()">&#9881; Settings</button>
+  </div>
+  <div id="tab-bar"></div>
+  <main id="main"></main>
+</div>
+<script>
+'use strict';
+const FLM=1.26,BUCKETS=['CAC','COGS','G&A','OpEx'],SALE_CHANNELS=['','Inbound','Outbound'];
+const PERF=['Good','Poor','Kev Direct','N/A'],ATTR_TYPES=['','Positive Attrition','Negative Attrition','Promotion Attrition'];
+const COUNTRIES=['USA','CAN','CN','PHL','BPO','Other'],DEPT_LEADER_TAG='Department Leader';
+function hashStr(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)+s.charCodeAt(i);return h>>>0;}
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+function uid(){return'e'+Date.now()+Math.random().toString(36).slice(2,5);}
+function slugify(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtK(n){if(!n&&n!==0)return'--';const a=Math.abs(n);if(a>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(a>=1e3)return'$'+Math.round(n/1e3)+'K';return'$'+Math.round(n);}
+function fmtFull(n){if(!n&&n!==0)return'--';return'$'+Math.round(n).toLocaleString();}
+function tenureMo(d){if(!d)return null;const s=new Date(d),now=new Date('2026-06-12');return Math.max(0,(now.getFullYear()-s.getFullYear())*12+(now.getMonth()-s.getMonth()));}
+function tenureLbl(m){if(m===null||m===undefined)return'--';if(m<12)return m+'mo';return Math.floor(m/12)+'y '+(m%12)+'mo';}
+function inits(n){return(n||'').split(' ').map(w=>w[0]).slice(0,2).join('');}
+function empFL(e){return e.ote?e.ote*FLM:0;}
+function pct(n,d){return d>0?(n/d)*100:0;}
+
+// Passwords baked in - Kev's actual passwords
+const DEFAULT_PW={smbmm:1060781850,impl:2089678035,support:2539767993,cs:2780356042,enable:2922040689,mktg:3003932433,admin:222563352};
+
+// BUILTIN_LEADERS = fallback only; real leaders come from state.leaders
+const BUILTIN_LEADERS=[
+  {id:'smbmm',label:'SMB/MM Sales + Onboarding',kev:'David Jacobs'},
+  {id:'impl',label:'Implementation',kev:'Naveen Love'},
+  {id:'support',label:'Customer Support',kev:'Nathan Gifford'},
+  {id:'cs',label:'Customer Success',kev:'Christopher Van Wart'},
+  {id:'enable',label:'Enablement',kev:'Steven Miller'},
+  {id:'mktg',label:'Marketing',kev:'Cloud Wu'},
+];
+
+function getLeaders(){
+  // Use state.leaders as the source of truth
+  // Update kev name from employees tagged Department Leader
+  const leaders = state.leaders.map(l=>({...l}));
+  state.employees.forEach(e=>{
+    if((e.teamTags||[]).includes(DEPT_LEADER_TAG)){
+      const l=leaders.find(x=>x.id===e.leaderId);
+      if(l) l.kev=e.name;
+    }
+  });
+  return leaders;
+}
+function seedEmployees(){return [
+  {id:"e1",leaderId:"impl",name:"Omar Mabruk",ote:163875,country:"USA",role:"Solutions Engineer",level:4,manager:"Naveen Love",teamTags:["Implementation"],startDate:"2026-02-23",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Implementation",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e2",leaderId:"impl",name:"Eneli Valencia-Oliva",ote:138000,country:"USA",role:"Sr. Implementation Manager",level:3,manager:"Naveen Love",teamTags:["Implementation"],startDate:"2023-08-28",performance:"Good",attrition:"",onLeave:true,notes:"MAT Leave - back August 18",c1:"CAC",w1:100,t1:"Implementation",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e3",leaderId:"impl",name:"Deepu Premrajan",ote:143750,country:"USA",role:"Sr. Implementation Manager",level:3,manager:"Naveen Love",teamTags:["Implementation"],startDate:"2026-02-23",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Implementation",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e4",leaderId:"impl",name:"Hariesha Smith",ote:138000,country:"USA",role:"Sr. Implementation Manager",level:3,manager:"Naveen Love",teamTags:["Implementation"],startDate:"2026-01-26",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Implementation",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e5",leaderId:"impl",name:"Rachel Shaw",ote:126500,country:"USA",role:"Sr. Implementation Manager",level:3,manager:"Naveen Love",teamTags:["Implementation"],startDate:"2025-01-21",performance:"Good",attrition:"",onLeave:false,notes:"Upcoming MAT in June",c1:"CAC",w1:100,t1:"Implementation",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e6",leaderId:"impl",name:"Anngelica Zabal",ote:109250,country:"USA",role:"Team Lead - Implementation",level:3,manager:"Naveen Love",teamTags:["Implementation"],startDate:"2024-09-23",performance:"Good",attrition:"",onLeave:false,notes:"Recently Promoted",c1:"CAC",w1:100,t1:"Implementation",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e7",leaderId:"impl",name:"Kristin Auzat",ote:88000,country:"USA",role:"Implementation Manager",level:2,manager:"Anngelica Zabal",teamTags:["Implementation"],startDate:"2024-10-16",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Implementation",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e8",leaderId:"impl",name:"Blake Richardson",ote:84400,country:"USA",role:"Implementation Manager",level:2,manager:"Anngelica Zabal",teamTags:["Implementation"],startDate:"2025-08-11",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Implementation",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e9",leaderId:"impl",name:"Qiu Chen",ote:23000,country:"CN",role:"Data Migration Engineer",level:3,manager:"Jessie Wu",teamTags:["Data"],startDate:"2023-11-01",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:70,t1:"Implementation",ch1:"",c2:"COGS",w2:30,t2:"Support",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e10",leaderId:"impl",name:"Andrew Ye",ote:19000,country:"CN",role:"Data Migration Engineer",level:3,manager:"Jessie Wu",teamTags:["Data"],startDate:"2024-09-02",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:70,t1:"Implementation",ch1:"",c2:"COGS",w2:30,t2:"Support",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e11",leaderId:"impl",name:"Julie Yang",ote:19000,country:"CN",role:"Data Migration Engineer",level:3,manager:"Jessie Wu",teamTags:["Data"],startDate:"2024-11-04",performance:"Good",attrition:"Negative Attrition",onLeave:false,notes:"",c1:"CAC",w1:70,t1:"Implementation",ch1:"",c2:"COGS",w2:30,t2:"Support",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e12",leaderId:"impl",name:"Ryan Clark",ote:103500,country:"USA",role:"Data Migration Engineer",level:3,manager:"Jessie Wu",teamTags:["Data"],startDate:"2026-03-23",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:70,t1:"Implementation",ch1:"",c2:"COGS",w2:30,t2:"Support",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e13",leaderId:"impl",name:"Jessie Wu",ote:172500,country:"USA",role:"Manager, Data Migration",level:5,manager:"Naveen Love",teamTags:["Data"],startDate:"2025-09-22",performance:"Poor",attrition:"Positive Attrition",onLeave:false,notes:"Struggling to meet org needs. Need exit plan.",c1:"CAC",w1:100,t1:"Implementation",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e14",leaderId:"impl",name:"Naveen Love",ote:207000,country:"USA",role:"Director of Implementation",level:7,manager:"Kev Dazkevich",teamTags:["Department Leader"],startDate:"2026-01-12",performance:"Kev Direct",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Implementation",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e15",leaderId:"support",name:"Peter Hart",ote:55000,country:"USA",role:"Customer Support Specialist",level:2,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2025-09-22",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e16",leaderId:"support",name:"Joseph Kilgore",ote:71000,country:"USA",role:"Customer Support Specialist",level:3,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2024-10-28",performance:"Good",attrition:"Promotion Attrition",onLeave:false,notes:"Wants to grow into 6 figures.",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e17",leaderId:"support",name:"Sean Courey-Pickering",ote:126500,country:"USA",role:"Support Team Lead",level:4,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2024-11-20",performance:"Poor",attrition:"Positive Attrition",onLeave:false,notes:"Looking to get out of support.",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e18",leaderId:"support",name:"Sam Pineda",ote:43000,country:"CAN",role:"Customer Support Specialist",level:2,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2026-03-23",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e19",leaderId:"support",name:"Samantha Sullivan",ote:90000,country:"USA",role:"Sr. Customer Support Specialist",level:2,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2024-04-17",performance:"Poor",attrition:"",onLeave:false,notes:"Receiving coaching plan.",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e20",leaderId:"support",name:"Rebekah Martin",ote:101250,country:"USA",role:"Customer Support Specialist",level:3,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2024-07-22",performance:"Good",attrition:"Negative Attrition",onLeave:false,notes:"Wants to grow.",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e21",leaderId:"support",name:"Sai",ote:null,country:"CN",role:"Customer Support Specialist",level:4,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2022-10-26",performance:"Good",attrition:"",onLeave:false,notes:"Likely not at risk.",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e22",leaderId:"support",name:"Wayne",ote:null,country:"CN",role:"Customer Support Specialist",level:2,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2024-07-11",performance:"Good",attrition:"",onLeave:false,notes:"Likely not at risk.",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e23",leaderId:"support",name:"Stella",ote:null,country:"CN",role:"Customer Support Specialist",level:2,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2023-12-15",performance:"Good",attrition:"",onLeave:false,notes:"Standout - consider reward.",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e24",leaderId:"support",name:"Ross (Support Ninja)",ote:29400,country:"BPO",role:"BPO Support Specialist",level:2,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2025-06-24",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e25",leaderId:"support",name:"Anne (Support Ninja)",ote:29400,country:"BPO",role:"BPO Support Specialist",level:2,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2025-12-08",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e26",leaderId:"support",name:"Raffy (Support Ninja)",ote:29400,country:"BPO",role:"BPO Support Specialist",level:1,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2025-06-24",performance:"Poor",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e27",leaderId:"support",name:"Kristine (TDCX)",ote:29400,country:"BPO",role:"BPO Support Specialist",level:2,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2025-06-11",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e28",leaderId:"support",name:"Ria (TDCX)",ote:29400,country:"BPO",role:"BPO Support Specialist",level:2,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2025-06-13",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e29",leaderId:"support",name:"Andrei (TDCX)",ote:29400,country:"BPO",role:"BPO Support Specialist",level:2,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2025-06-11",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e30",leaderId:"support",name:"Lilit (TDCX)",ote:29400,country:"BPO",role:"BPO Support Specialist",level:1,manager:"Nathan Gifford",teamTags:["Support"],startDate:"2025-06-11",performance:"Poor",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e31",leaderId:"support",name:"Nathan Gifford",ote:149500,country:"USA",role:"Head of Customer Support",level:6,manager:"Kev Dazkevich",teamTags:["Department Leader"],startDate:"2025-06-18",performance:"Kev Direct",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Support",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e32",leaderId:"enable",name:"Erika Intfen",ote:176000,country:"USA",role:"Enablement Specialist",level:5,manager:"Steven Miller",teamTags:["Enablement"],startDate:"2025-09-02",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"G&A",w1:100,t1:"Enablement",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e33",leaderId:"enable",name:"Marina",ote:35000,country:"CN",role:"Enablement Specialist",level:2,manager:"Steven Miller",teamTags:["Enablement"],startDate:"2022-11-28",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"G&A",w1:100,t1:"Enablement",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e34",leaderId:"enable",name:"Steven Miller",ote:300000,country:"USA",role:"Head of Global Enablement",level:8,manager:"Kev Dazkevich",teamTags:["Department Leader"],startDate:"2026-03-23",performance:"Kev Direct",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:50,t1:"Enablement",ch1:"",c2:"G&A",w2:50,t2:"Enablement",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e35",leaderId:"smbmm",name:"James Yuan",ote:135304,country:"USA",role:"Inbound AE",level:2,manager:"David Jacobs",teamTags:["Sales"],startDate:"2024-02-06",performance:"Poor",attrition:"",onLeave:false,notes:"81.9% to April Quota - 30 Day Coaching Plan",c1:"CAC",w1:100,t1:"Sales",ch1:"Inbound",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e36",leaderId:"smbmm",name:"Jared Borja-Perez",ote:130304,country:"USA",role:"Inbound AE",level:2,manager:"David Jacobs",teamTags:["Sales"],startDate:"2024-09-09",performance:"Poor",attrition:"",onLeave:false,notes:"89.5% to Quota - 30 Day Coaching Plan",c1:"CAC",w1:100,t1:"Sales",ch1:"Inbound",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e37",leaderId:"smbmm",name:"Benjamin Frankel",ote:156000,country:"USA",role:"Inbound AE",level:2,manager:"David Jacobs",teamTags:["Sales"],startDate:"2023-08-16",performance:"Poor",attrition:"",onLeave:false,notes:"99.7% to Quota - 30 Day Coaching Plan",c1:"CAC",w1:100,t1:"Sales",ch1:"Inbound",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e38",leaderId:"smbmm",name:"Dillon Wagner",ote:200000,country:"USA",role:"Enterprise AE",level:5,manager:"Kev Dazkevich",teamTags:["Sales"],startDate:"2023-01-09",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Sales",ch1:"Outbound",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e39",leaderId:"smbmm",name:"Minnie Lin",ote:90000,country:"USA",role:"SDR",level:1,manager:"David Jacobs",teamTags:["Sales"],startDate:"2023-08-14",performance:"Good",attrition:"",onLeave:false,notes:"90 Day SDR to AE Coaching Plan.",c1:"CAC",w1:100,t1:"Sales",ch1:"Inbound",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e40",leaderId:"smbmm",name:"David Jacobs",ote:282000,country:"CAN",role:"Director of Sales",level:7,manager:"Kev Dazkevich",teamTags:["Department Leader"],startDate:"2026-03-23",performance:"Kev Direct",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:50,t1:"Sales",ch1:"",c2:"CAC",w2:50,t2:"Onboarding",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e41",leaderId:"smbmm",name:"Joshua Heffner",ote:93500,country:"USA",role:"Onboarding Specialist",level:2,manager:"David Jacobs",teamTags:["Onboarding"],startDate:"2025-06-16",performance:"Poor",attrition:"Positive Attrition",onLeave:false,notes:"Recently exited a PIP. 30 day PIP needed to exit with cause.",c1:"CAC",w1:100,t1:"Onboarding",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e42",leaderId:"smbmm",name:"Elizabeth Johnson",ote:102000,country:"USA",role:"Onboarding Specialist",level:3,manager:"David Jacobs",teamTags:["Onboarding"],startDate:"2022-10-11",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Onboarding",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e43",leaderId:"smbmm",name:"Mitch Lewis",ote:200000,country:"USA",role:"Principle AE",level:4,manager:"David Jacobs",teamTags:["Sales"],startDate:"2026-06-29",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Sales",ch1:"Outbound",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e44",leaderId:"cs",name:"Lucio Martiarena",ote:110500,country:"USA",role:"Customer Success Manager",level:2,manager:"Christopher Van Wart",teamTags:["Customer Success"],startDate:"2025-10-27",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Customer Success",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e45",leaderId:"cs",name:"Jerica Tarquinio",ote:130000,country:"USA",role:"Customer Success Manager",level:2,manager:"Christopher Van Wart",teamTags:["Customer Success"],startDate:"2024-09-30",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Customer Success",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e46",leaderId:"cs",name:"Aathirai Parthiban",ote:170000,country:"USA",role:"Customer Success Manager",level:3,manager:"Christopher Van Wart",teamTags:["Customer Success"],startDate:"2024-07-08",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Customer Success",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e47",leaderId:"cs",name:"Rebecca Moskob",ote:113500,country:"CAN",role:"Customer Success Manager",level:3,manager:"Christopher Van Wart",teamTags:["Customer Success"],startDate:"2026-03-30",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Customer Success",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e48",leaderId:"cs",name:"William Costin",ote:120750,country:"USA",role:"Customer Success Manager",level:3,manager:"Christopher Van Wart",teamTags:["Customer Success"],startDate:"2025-12-22",performance:"Good",attrition:"Negative Attrition",onLeave:false,notes:"Feels he should be the manager. Not ready for people leadership.",c1:"COGS",w1:100,t1:"Customer Success",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e49",leaderId:"cs",name:"Mike Palma",ote:31200,country:"PHL",role:"Customer Success Manager",level:2,manager:"Christopher Van Wart",teamTags:["Customer Success"],startDate:"2025-08-21",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Customer Success",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e50",leaderId:"cs",name:"Christopher Van Wart",ote:166750,country:"USA",role:"Senior Manager, Customer Success",level:6,manager:"Kev Dazkevich",teamTags:["Department Leader"],startDate:"2026-05-11",performance:"Kev Direct",attrition:"",onLeave:false,notes:"",c1:"COGS",w1:100,t1:"Customer Success",ch1:"",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e17810219941581a8",leaderId:"mktg",name:"Cloud Wu",ote:190000,country:"USA",role:"Head of Marketing",level:7,manager:"Kev Dazkevich",teamTags:["Department Leader"],startDate:"2025-03-03",performance:"Kev Direct",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Marketing",ch1:"Inbound",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e1781022148836hlw",leaderId:"mktg",name:"Ivy Nguyen",ote:77304,country:"USA",role:"Marketing Manager",level:3,manager:"Cloud Wu",teamTags:["Marketing"],startDate:"2025-03-17",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Marketing",ch1:"Inbound",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e1781022236073ckt",leaderId:"mktg",name:"Pamela Pan",ote:135000,country:"USA",role:"Product Marketing Manager",level:3,manager:"Cloud Wu",teamTags:["Marketing"],startDate:"2026-02-17",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Marketing",ch1:"Inbound",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e1781022408374834",leaderId:"mktg",name:"Feier Mo",ote:100000,country:"USA",role:"Marketing Manager",level:3,manager:"Cloud Wu",teamTags:["Marketing"],startDate:"2023-05-03",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Marketing",ch1:"Inbound",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+  {id:"e1781022486563omw",leaderId:"mktg",name:"Yangyuchen Li",ote:93500,country:"USA",role:"Creative Designer",level:3,manager:"Cloud Wu",teamTags:["Marketing"],startDate:"2024-06-03",performance:"Good",attrition:"",onLeave:false,notes:"",c1:"CAC",w1:100,t1:"Marketing",ch1:"Inbound",c2:"",w2:0,t2:"",ch2:"",c3:"",w3:0,t3:"",ch3:""},
+];}
+function seedReqs(){return [
+  {id:"r1",leaderId:"support",role:"Customer Support Specialist",teamTags:["Support"],notes:""},
+  {id:"r2",leaderId:"support",role:"Customer Support Specialist",teamTags:["Support"],notes:""},
+  {id:"r3",leaderId:"support",role:"Customer Support Specialist",teamTags:["Support"],notes:""},
+  {id:"r5",leaderId:"smbmm",role:"Outbound AE",teamTags:["Sales"],notes:""},
+  {id:"r6",leaderId:"smbmm",role:"Outbound AE",teamTags:["Sales"],notes:""},
+  {id:"r7",leaderId:"smbmm",role:"Inbound AE",teamTags:["Sales"],notes:"Not going to post - outbound only"},
+  {id:"r8",leaderId:"smbmm",role:"Inbound AE",teamTags:["Sales"],notes:"Not going to post - outbound only"},
+  {id:"r9",leaderId:"smbmm",role:"Outbound District Manager",teamTags:["Sales"],notes:"Have a candidate in mind"},
+  {id:"r10",leaderId:"smbmm",role:"Inbound Sales & Onboarding DM",teamTags:["Onboarding"],notes:"Have a candidate in mind"},
+];}
+
+// State - leaders now stored in state so they can be added/removed
+const state={
+  employees:  load('moego_emp',null)||seedEmployees(),
+  reqs:       load('moego_reqs',null)||seedReqs(),
+  attritionLog: load('moego_attrlog',[]),
+  // Leaders are fully dynamic - stored in state
+  leaders:    load('moego_leaders',null)||BUILTIN_LEADERS.map(l=>({...l})),
+  arr:        load('moego_arr',26500000),
+  dealsTotal:   load('moego_dealstotal',170),
+  dealsInbound: load('moego_dealsinb',0),
+  dealsOutbound:load('moego_dealsoutb',0),
+  dealPeriod:   load('moego_dealperiod','annual'),
+  perDealCac:   load('moego_perdealcac',0),
+  arpuAvg:      load('moego_arpuavg',0),
+  arpuInbound:  load('moego_arpuinb',0),
+  arpuOutbound: load('moego_arpuoutb',0),
+  otherGmHitPct:load('moego_othergm',0),
+  teamTags:   load('moego_tags',['Sales','Onboarding','Implementation','Customer Success','Support','Enablement','Marketing','RevOps','Data','G&A','OpEx',DEPT_LEADER_TAG]),
+  passwords:  Object.assign({},DEFAULT_PW,load('moego_pw',{})),
+  unlocked:{},
+  activeTab:'dashboard',
+  search:'',filterPerf:'all',filterAttr:'all',
+  attrSearch:'',attrFilterType:'all',attrFilterOrg:'all',
+};
+
+function persist(){
+  save('moego_emp',state.employees);save('moego_reqs',state.reqs);save('moego_attrlog',state.attritionLog);
+  save('moego_leaders',state.leaders);
+  save('moego_arr',state.arr);save('moego_dealstotal',state.dealsTotal);save('moego_dealsinb',state.dealsInbound);
+  save('moego_dealsoutb',state.dealsOutbound);save('moego_dealperiod',state.dealPeriod);save('moego_perdealcac',state.perDealCac);
+  save('moego_arpuavg',state.arpuAvg);save('moego_arpuinb',state.arpuInbound);save('moego_arpuoutb',state.arpuOutbound);
+  save('moego_othergm',state.otherGmHitPct);save('moego_tags',state.teamTags);save('moego_pw',state.passwords);
+}
+
+function calcFin(){
+  const leaders=getLeaders();
+  const byLeader={};
+  leaders.forEach(l=>{byLeader[l.id]={CAC:0,COGS:0,'G&A':0,OpEx:0,headcount:0,onLeave:0,openReqs:0,poor:0,attrition:0,negAttrition:0,posAttrition:0,promoAttrition:0};});
+  const cacByType={},cogsByType={},gaByType={},opexByType={};
+  const byTeam={};
+  state.teamTags.forEach(t=>{byTeam[t]={CAC:0,COGS:0,'G&A':0,OpEx:0,headcount:0,poor:0,attrition:0};});
+  let tCAC=0,tCOGS=0,tGA=0,tOpEx=0,tHC=0,tLeave=0,tPoor=0,tAttr=0,tNegAttr=0,tPosAttr=0,tPromoAttr=0,tReqs=0;
+  let cacInbSales=0,cacOutbSales=0,cacMktg=0,cacShared=0;
+
+  state.employees.forEach(e=>{
+    const fl=empFL(e);tHC++;
+    if(e.onLeave)tLeave++;
+    if(e.performance==='Poor')tPoor++;
+    if(e.attrition){tAttr++;if(e.attrition==='Negative Attrition')tNegAttr++;else if(e.attrition==='Positive Attrition')tPosAttr++;else if(e.attrition==='Promotion Attrition')tPromoAttr++;}
+    [[e.c1,e.w1,e.t1,e.ch1],[e.c2,e.w2,e.t2,e.ch2],[e.c3,e.w3,e.t3,e.ch3]].forEach(([c,w,t,ch])=>{
+      if(!c||!w)return;
+      const amt=fl*(w/100),tk=t||'(untagged)';
+      if(c==='CAC'){tCAC+=amt;cacByType[tk]=(cacByType[tk]||0)+amt;
+        if(ch==='Inbound')cacInbSales+=amt;
+        else if(ch==='Outbound')cacOutbSales+=amt;
+        else if(tk==='Marketing')cacMktg+=amt;
+        else cacShared+=amt;
+      }else if(c==='COGS'){tCOGS+=amt;cogsByType[tk]=(cogsByType[tk]||0)+amt;}
+      else if(c==='G&A'){tGA+=amt;gaByType[tk]=(gaByType[tk]||0)+amt;}
+      else if(c==='OpEx'){tOpEx+=amt;opexByType[tk]=(opexByType[tk]||0)+amt;}
+    });
+    if(byLeader[e.leaderId]){
+      const bl=byLeader[e.leaderId];
+      [[e.c1,e.w1],[e.c2,e.w2],[e.c3,e.w3]].forEach(([c,w])=>{if(!c||!w)return;const amt=fl*(w/100);if(c==='CAC')bl.CAC+=amt;else if(c==='COGS')bl.COGS+=amt;else if(c==='G&A')bl['G&A']+=amt;else if(c==='OpEx')bl.OpEx+=amt;});
+      bl.headcount++;if(e.onLeave)bl.onLeave++;if(e.performance==='Poor')bl.poor++;
+      if(e.attrition){bl.attrition++;if(e.attrition==='Negative Attrition')bl.negAttrition++;else if(e.attrition==='Positive Attrition')bl.posAttrition++;else if(e.attrition==='Promotion Attrition')bl.promoAttrition++;}
+    }
+    const tags=e.teamTags||[];
+    if(tags.length>0){
+      const perTag=1/tags.length;
+      tags.forEach(tag=>{
+        if(!byTeam[tag])byTeam[tag]={CAC:0,COGS:0,'G&A':0,OpEx:0,headcount:0,poor:0,attrition:0};
+        [[e.c1,e.w1],[e.c2,e.w2],[e.c3,e.w3]].forEach(([c,w])=>{if(!c||!w)return;const amt=fl*(w/100)*perTag;if(c==='CAC')byTeam[tag].CAC+=amt;else if(c==='COGS')byTeam[tag].COGS+=amt;else if(c==='G&A')byTeam[tag]['G&A']+=amt;else if(c==='OpEx')byTeam[tag].OpEx+=amt;});
+        byTeam[tag].headcount+=perTag;if(e.performance==='Poor')byTeam[tag].poor+=perTag;if(e.attrition)byTeam[tag].attrition+=perTag;
+      });
+    }
+  });
+  state.reqs.forEach(r=>{tReqs++;if(byLeader[r.leaderId])byLeader[r.leaderId].openReqs++;});
+  // Total go-lives derived from inbound + outbound (not manually entered)
+  const totalGoLives=(state.dealsInbound||0)+(state.dealsOutbound||0);
+  const div=state.dealPeriod==='monthly'?12:1;
+  // Shared costs fully loaded into BOTH channels (not split proportionally)
+  const inbCacAnn=cacInbSales+cacMktg+cacShared;
+  const outbCacAnn=cacOutbSales+cacShared;
+  const cacPer=tCAC/div,cacInbPer=inbCacAnn/div,cacOutbPer=outbCacAnn/div;
+  const cacPerDeal=totalGoLives>0?(cacPer/totalGoLives)+state.perDealCac:null;
+  const cacInbPerDeal=state.dealsInbound>0?(cacInbPer/state.dealsInbound)+state.perDealCac:null;
+  const cacOutbPerDeal=state.dealsOutbound>0?(cacOutbPer/state.dealsOutbound)+state.perDealCac:null;
+  const gtmGmHit=state.arr>0?(tCOGS/state.arr)*100:0;
+  const totalGmHit=gtmGmHit+(state.otherGmHitPct||0);
+  const gmPct=Math.max(0,1-totalGmHit/100);
+  function pb(cac,arpu){if(!cac||!arpu||!gmPct||gmPct<=0)return null;return cac/(arpu*gmPct/12);}
+  return{byLeader,byTeam,cacByType,cogsByType,gaByType,opexByType,tCAC,tCOGS,tGA,tOpEx,tHC,tLeave,tPoor,poorPct:pct(tPoor,tHC),tAttr,tNegAttr,tPosAttr,tPromoAttr,tReqs,totalSpend:tCAC+tCOGS+tGA+tOpEx,gtmGmHit,totalGmHit,gmPct,cacInbSales,cacOutbSales,cacMktg,cacShared,inbCacAnn,outbCacAnn,cacPer,cacInbPer,cacOutbPer,cacPerDeal,cacInbPerDeal,cacOutbPerDeal,paybackAvg:pb(cacPerDeal,state.arpuAvg),paybackInb:pb(cacInbPerDeal,state.arpuInbound),paybackOutb:pb(cacOutbPerDeal,state.arpuOutbound),totalGoLives,leaders};
+}
+
+function render(){renderTabs();renderMain();}
+function refreshApp(){persist();render();}
+
+function renderTabs(){
+  const leaders=getLeaders();
+  const bar=document.getElementById('tab-bar');
+  const tabs=[{id:'dashboard',label:'Dashboard'},...leaders.map(l=>({id:l.id,label:l.label})),{id:'attrition',label:'Attrition'}];
+  bar.innerHTML=tabs.map(t=>`<button class="tab${state.activeTab===t.id?' active':''}" onclick="setTab('${t.id}')">${esc(t.label)}</button>`).join('');
+}
+function setTab(id){state.activeTab=id;state.search='';state.filterPerf='all';state.filterAttr='all';render();}
+function renderMain(){
+  const m=document.getElementById('main');
+  if(state.activeTab==='dashboard')m.innerHTML=renderDashboard();
+  else if(state.activeTab==='attrition')m.innerHTML=renderAttritionTab();
+  else m.innerHTML=renderLeaderTab(state.activeTab);
+}
+
+// Inline widget for numeric inputs on dashboard
+function iw(id,field,label,prefix,suffix){
+  const v=state[field]||0;
+  const disp=prefix+v.toLocaleString()+(suffix||'');
+  return`<div class="iw"><span class="iw-lbl">${label}:</span><button class="iw-val" id="iw-btn-${id}" onclick="iwEdit('${id}','${field}','${prefix}','${suffix||''}')">${disp}</button></div>`;
+}
+function iwEdit(id,field,prefix,suffix){
+  const btn=document.getElementById('iw-btn-'+id);if(!btn)return;
+  const inp=document.createElement('input');inp.type='number';inp.value=state[field]||0;inp.className='iw-inp';
+  btn.replaceWith(inp);inp.focus();inp.select();
+  function commit(){state[field]=parseFloat(inp.value)||0;persist();renderMain();}
+  // No onblur - only commit on Enter or when user clicks away via a save button
+  // But we DO need some way to finish - use explicit Enter + Escape only
+  inp.onkeydown=e=>{if(e.key==='Enter'){commit();}if(e.key==='Escape'){inp.replaceWith(btn);}};
+  // Re-add a softer blur that only fires if user clicks elsewhere in the page (not another input)
+  inp.addEventListener('blur',function(e){
+    // Only auto-commit if focus went outside the iw widget area
+    setTimeout(()=>{ if(document.activeElement!==inp && document.getElementById('iw-btn-'+id)===null){commit();} },150);
+  });
+}
+function pbDisp(mo){
+  if(mo===null||mo===undefined||!isFinite(mo))return'<span style="color:var(--g400)">--</span>';
+  const r=Math.round(mo);
+  return`<span class="${r<=12?'pb-good':r<=24?'pb-ok':'pb-bad'}">${r}mo</span>`;
+}
+function setPeriod(p){state.dealPeriod=p;persist();renderMain();}
+function renderDashboard(){
+  const fin=calcFin();
+  const gmColor=fin.gtmGmHit<=10?'var(--green)':fin.gtmGmHit<=25?'var(--amber)':'var(--red)';
+  const poorColor=fin.poorPct<=5?'var(--green)':fin.poorPct<=15?'var(--amber)':'var(--red)';
+  function bar(lbl,val,total,color){if(!val||val<=0)return'';const p=total>0?Math.max((val/total)*100,2):0;return`<div class="bar-item"><div class="bar-row"><span class="bar-lbl">${esc(lbl)}</span><span class="bar-val">${fmtK(val)}</span></div><div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${color}"></div></div></div>`;}
+  const cacE=Object.entries(fin.cacByType).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const cogsE=Object.entries(fin.cogsByType).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const gaE=Object.entries(fin.gaByType).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const opexE=Object.entries(fin.opexByType).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const pLbl=state.dealPeriod==='monthly'?'Monthly':'Annual';
+  const cacRows=[['Total',fin.cacPerDeal,fin.cacPer,fin.totalGoLives,state.arpuAvg,fin.paybackAvg],['Inbound',fin.cacInbPerDeal,fin.cacInbPer,state.dealsInbound,state.arpuInbound,fin.paybackInb],['Outbound',fin.cacOutbPerDeal,fin.cacOutbPer,state.dealsOutbound,state.arpuOutbound,fin.paybackOutb]];
+  const leaderRows=fin.leaders.map((l,i)=>{
+    const d=fin.byLeader[l.id]||{};const tot=(d.CAC||0)+(d.COGS||0)+(d['G&A']||0)+(d.OpEx||0);
+    const hc=d.headcount||0,pp=hc>0?Math.round(pct(d.poor||0,hc)):0;const bg=i%2===0?'#fff':'#fafafa';
+    return`<tr><td style="background:${bg};font-weight:500">${esc(l.label)}</td><td style="background:${bg};color:var(--g600);font-size:11px">${esc(l.kev)}</td><td class="r mono" style="background:${bg}">${hc}</td><td class="r mono" style="background:${bg};color:${(d.negAttrition||0)>0?'var(--red)':'var(--g300)'}">${d.negAttrition||0}</td><td class="r mono" style="background:${bg};color:${(d.posAttrition||0)>0?'var(--green)':'var(--g300)'}">${d.posAttrition||0}</td><td class="r mono" style="background:${bg};color:${(d.promoAttrition||0)>0?'var(--blue)':'var(--g300)'}">${d.promoAttrition||0}</td><td class="r" style="background:${bg}"><span style="font-family:monospace;font-size:11px;color:${pp>15?'var(--red)':pp>5?'var(--amber)':'var(--g300)'}">${pp>0?pp+'%':'--'}</span></td><td class="r mono" style="background:${bg};color:${(d.CAC||0)>0?'var(--or)':'var(--g300)'}">${(d.CAC||0)>0?fmtK(d.CAC):'--'}</td><td class="r mono" style="background:${bg};color:${(d.COGS||0)>0?'var(--blue)':'var(--g300)'}">${(d.COGS||0)>0?fmtK(d.COGS):'--'}</td><td class="r mono" style="background:${bg};color:${(d['G&A']||0)>0?'var(--g600)':'var(--g300)'}">${(d['G&A']||0)>0?fmtK(d['G&A']):'--'}</td><td class="r mono" style="background:${bg};color:${(d.OpEx||0)>0?'var(--purple)':'var(--g300)'}">${(d.OpEx||0)>0?fmtK(d.OpEx):'--'}</td><td class="r mono" style="background:${bg};font-weight:600">${tot>0?fmtK(tot):'--'}</td></tr>`;
+  }).join('');
+  const activeTeams=state.teamTags.filter(t=>fin.byTeam[t]&&(fin.byTeam[t].headcount||0)>0);
+  const teamRows=activeTeams.map((t,i)=>{const d=fin.byTeam[t];const tot=(d.CAC||0)+(d.COGS||0)+(d['G&A']||0)+(d.OpEx||0);const hc=Math.round(d.headcount||0),pp=d.headcount>0?Math.round(pct(d.poor||0,d.headcount)):0;const bg=i%2===0?'#fff':'#fafafa';return`<tr><td style="background:${bg};font-weight:500">${esc(t)}</td><td class="r mono" style="background:${bg}">${hc}</td><td class="r" style="background:${bg}"><span style="font-family:monospace;font-size:11px;color:${pp>15?'var(--red)':pp>5?'var(--amber)':'var(--g300)'}">${pp>0?pp+'%':'--'}</span></td><td class="r mono" style="background:${bg};color:${(d.attrition||0)>0?'var(--amber)':'var(--g300)'}">${Math.round(d.attrition||0)||'--'}</td><td class="r mono" style="background:${bg};color:${(d.CAC||0)>0?'var(--or)':'var(--g300)'}">${(d.CAC||0)>0?fmtK(d.CAC):'--'}</td><td class="r mono" style="background:${bg};color:${(d.COGS||0)>0?'var(--blue)':'var(--g300)'}">${(d.COGS||0)>0?fmtK(d.COGS):'--'}</td><td class="r mono" style="background:${bg};color:${(d['G&A']||0)>0?'var(--g600)':'var(--g300)'}">${(d['G&A']||0)>0?fmtK(d['G&A']):'--'}</td><td class="r mono" style="background:${bg};color:${(d.OpEx||0)>0?'var(--purple)':'var(--g300)'}">${(d.OpEx||0)>0?fmtK(d.OpEx):'--'}</td><td class="r mono" style="background:${bg};font-weight:600">${tot>0?fmtK(tot):'--'}</td></tr>`;}).join('');
+  const atRisk=state.employees.filter(e=>e.attrition);
+  const riskRows='<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">'+atRisk.map(e=>{const tc=e.attrition==='Negative Attrition'?'bg-red':e.attrition==='Positive Attrition'?'bg-green':'bg-blue';const leader=fin.leaders.find(l=>l.id===e.leaderId);return`<div style="background:var(--g100);border-radius:6px;padding:6px 8px"><div style="font-weight:600;font-size:11px;margin-bottom:2px">${esc(e.name)}</div><div style="font-size:10px;color:var(--g600);margin-bottom:4px">${esc(leader?.kev||'')}</div><span class="badge ${tc}" style="font-size:9px">${esc(e.attrition)}</span></div>`;}).join('')+'</div>';
+  const inbPctLbl=Math.round((fin.inbR||0)*100),outbPctLbl=Math.round((fin.outbR||0)*100);
+  return`
+  <div class="page-header">
+    <div><div class="page-title">GTM Dashboard</div><div class="page-sub">Fully loaded ${Math.round((FLM-1)*100)}% overhead &middot; ${fin.tHC} employees &middot; ${fin.tReqs} open reqs</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      ${iw('arr','arr','ARR','$','')}
+      ${iw('othergm','otherGmHitPct','Other GM Hit','','%')}
+    </div>
+  </div>
+  <div class="cac-section">
+    <div class="cac-title"><span>CAC Per Deal &amp; Payback</span>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span style="font-size:11px;color:var(--g600)">Period:</span>
+        <button class="btn btn-sm ${state.dealPeriod==='annual'?'btn-primary':'btn-secondary'}" onclick="setPeriod('annual')">Annual</button>
+        <button class="btn btn-sm ${state.dealPeriod==='monthly'?'btn-primary':'btn-secondary'}" onclick="setPeriod('monthly')">Monthly</button>
+      </div>
+    </div>
+    <div class="inputs-row">
+      <div class="iw"><span class="iw-lbl">Go-Lives (Total):</span><span style="font-family:monospace;font-size:13px;font-weight:600;color:var(--g600)">${((state.dealsInbound||0)+(state.dealsOutbound||0)).toLocaleString()}</span><span style="font-size:10px;color:var(--g400);margin-left:4px">auto</span></div>
+      ${iw('di','dealsInbound','Go-Lives (Inbound)','','')}
+      ${iw('do','dealsOutbound','Go-Lives (Outbound)','','')}
+      ${iw('pdc','perDealCac','Per-Deal CAC Addon','$','')}
+    </div>
+    <div class="inputs-row">
+      ${iw('aa','arpuAvg','ARPU (Avg)','$','')}
+      ${iw('ai','arpuInbound','ARPU (Inbound)','$','')}
+      ${iw('ao','arpuOutbound','ARPU (Outbound)','$','')}
+    </div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>Channel</th><th class="r">${pLbl} CAC</th><th class="r">Go-Lives</th><th class="r">CAC/Go-Live</th><th class="r">ARPU</th><th class="r">GM Hit</th><th class="r">Payback</th></tr></thead>
+      <tbody>${cacRows.map(([lbl,pd,pc,deals,arpu,pb],i)=>{const bg=i%2===0?'#fff':'#fafafa';const gmc=fin.totalGmHit<=15?'var(--green)':fin.totalGmHit<=30?'var(--amber)':'var(--red)';return`<tr><td style="background:${bg};font-weight:600">${lbl}</td><td class="r mono" style="background:${bg}">${pc>0?fmtK(pc):'--'}</td><td class="r mono" style="background:${bg}">${deals||'--'}</td><td class="r mono" style="background:${bg};color:var(--or);font-weight:600">${pd?fmtFull(pd):'--'}</td><td class="r mono" style="background:${bg}">${arpu?fmtFull(arpu):'--'}</td><td class="r" style="background:${bg}"><span style="font-family:monospace;color:${gmc}">${fin.totalGmHit.toFixed(1)}%</span></td><td class="r" style="background:${bg}">${pbDisp(pb)}</td></tr>`;}).join('')}</tbody>
+    </table></div>
+    <div style="margin-top:8px;font-size:10px;color:var(--g400)">
+      GM Hit = GTM COGS (${fin.gtmGmHit.toFixed(1)}%) + Other (${(state.otherGmHitPct||0).toFixed(1)}%) = ${fin.totalGmHit.toFixed(1)}% &middot;
+      Inbound CAC: Inbound Sales + Marketing + Full Shared (not split) &middot; Outbound CAC: Outbound Sales + Full Shared, no Marketing
+    </div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat" style="border-top-color:var(--or)"><div class="stat-lbl">Headcount</div><div class="stat-val">${fin.tHC}</div><div class="stat-sub">${fin.tLeave} on leave &middot; ${fin.tReqs} open reqs</div></div>
+    <div class="stat" style="border-top-color:var(--red)"><div class="stat-lbl">Neg Attrition</div><div class="stat-val" style="color:var(--red)">${fin.tNegAttr}</div><div class="stat-sub">${fin.tPosAttr} pos &middot; ${fin.tPromoAttr} promo</div></div>
+    <div class="stat" style="border-top-color:${poorColor}"><div class="stat-lbl">Underperformers</div><div class="stat-val" style="color:${poorColor}">${fin.poorPct.toFixed(1)}%</div><div class="stat-sub">${fin.tPoor} of ${fin.tHC}</div></div>
+    <div class="stat" style="border-top-color:${gmColor}"><div class="stat-lbl">GTM GM Hit</div><div class="stat-val" style="color:${gmColor}">${fin.gtmGmHit.toFixed(1)}%</div><div class="stat-sub">COGS &divide; ARR</div></div>
+    <div class="stat" style="border-top-color:var(--or)"><div class="stat-lbl">Total CAC</div><div class="stat-val">${fmtK(fin.tCAC)}</div><div class="stat-sub">${fmtK(fin.tCAC/12)}/mo</div></div>
+    <div class="stat" style="border-top-color:var(--blue)"><div class="stat-lbl">Total COGS</div><div class="stat-val">${fmtK(fin.tCOGS)}</div><div class="stat-sub">${fmtK(fin.tCOGS/12)}/mo</div></div>
+    <div class="stat" style="border-top-color:var(--purple)"><div class="stat-lbl">Total OpEx</div><div class="stat-val">${fmtK(fin.tOpEx)}</div><div class="stat-sub">${fmtK(fin.tOpEx/12)}/mo</div></div>
+    <div class="stat" style="border-top-color:var(--g600)"><div class="stat-lbl">Total G&amp;A</div><div class="stat-val">${fmtK(fin.tGA)}</div><div class="stat-sub">${fmtK(fin.tGA/12)}/mo</div></div>
+  </div>
+  <div class="panels">
+    <div class="panel"><div class="panel-hdr"><span class="panel-ttl">CAC by Type</span><span class="panel-tot" style="color:var(--or)">${fmtK(fin.tCAC)}</span></div>${cacE.map(([k,v])=>bar(k,v,fin.tCAC,'var(--or)')).join('')||'<div style="font-size:11px;color:var(--g400)">No data</div>'}<div class="panel-foot"><span style="color:var(--g400)">Monthly</span><span style="font-family:monospace;color:var(--g600)">${fmtK(fin.tCAC/12)}/mo</span></div></div>
+    <div class="panel"><div class="panel-hdr"><span class="panel-ttl">COGS by Type</span><span class="panel-tot" style="color:var(--blue)">${fmtK(fin.tCOGS)}</span></div>${cogsE.map(([k,v])=>bar(k,v,fin.tCOGS,'var(--blue)')).join('')||'<div style="font-size:11px;color:var(--g400)">No data</div>'}<div class="panel-foot"><span style="color:var(--g400)">Monthly</span><span style="font-family:monospace;color:var(--g600)">${fmtK(fin.tCOGS/12)}/mo</span></div></div>
+    <div class="panel"><div class="panel-hdr"><span class="panel-ttl">G&amp;A by Type</span><span class="panel-tot" style="color:var(--g600)">${fmtK(fin.tGA)}</span></div>${gaE.map(([k,v])=>bar(k,v,fin.tGA,'var(--g600)')).join('')||'<div style="font-size:11px;color:var(--g400)">No data</div>'}<div class="panel-foot"><span style="color:var(--g400)">Monthly</span><span style="font-family:monospace;color:var(--g600)">${fmtK(fin.tGA/12)}/mo</span></div></div>
+    <div class="panel"><div class="panel-hdr"><span class="panel-ttl">OpEx by Type</span><span class="panel-tot" style="color:var(--purple)">${fmtK(fin.tOpEx)}</span></div>${opexE.map(([k,v])=>bar(k,v,fin.tOpEx,'var(--purple)')).join('')||'<div style="font-size:11px;color:var(--g400)">No data</div>'}<div class="panel-foot"><span style="color:var(--g400)">Monthly</span><span style="font-family:monospace;color:var(--g600)">${fmtK(fin.tOpEx/12)}/mo</span></div></div>
+
+  </div>
+  <div class="card"><div class="card-hdr"><span class="card-ttl">Attrition Risk</span><span class="card-note">${atRisk.length} flagged</span><button class="btn-ghost" style="font-size:11px;color:var(--or)" onclick="setTab('attrition')">View Log &rarr;</button></div><div style="padding:12px 16px">${riskRows||'<div style="font-size:12px;color:var(--g400);padding:8px 0">No attrition flags</div>'}</div></div>
+  <div class="card"><div class="card-hdr"><span class="card-ttl">Cost by Kev Direct</span><span class="card-note">Annual fully loaded</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Org</th><th>Leader</th><th class="r">HC</th><th class="r" style="color:var(--red)">Neg</th><th class="r" style="color:var(--green)">Pos</th><th class="r" style="color:var(--blue)">Promo</th><th class="r">Poor%</th><th class="r">CAC</th><th class="r">COGS</th><th class="r">G&amp;A</th><th class="r" style="color:var(--purple)">OpEx</th><th class="r">Total FL</th></tr></thead>
+      <tbody>${leaderRows}</tbody>
+      <tfoot><tr><td colspan="2">Total</td><td class="r mono">${fin.tHC}</td><td class="r mono" style="color:var(--red)">${fin.tNegAttr}</td><td class="r mono" style="color:var(--green)">${fin.tPosAttr}</td><td class="r mono" style="color:var(--blue)">${fin.tPromoAttr}</td><td class="r mono" style="color:${fin.poorPct>15?'var(--red)':fin.poorPct>5?'var(--amber)':'inherit'}">${fin.poorPct.toFixed(1)}%</td><td class="r mono" style="color:var(--or)">${fmtK(fin.tCAC)}</td><td class="r mono" style="color:var(--blue)">${fmtK(fin.tCOGS)}</td><td class="r mono">${fmtK(fin.tGA)}</td><td class="r mono" style="color:var(--purple)">${fmtK(fin.tOpEx)}</td><td class="r mono">${fmtK(fin.totalSpend)}</td></tr></tfoot>
+    </table></div>
+  </div>
+  <div class="card"><div class="card-hdr"><span class="card-ttl">Cost by Team Tag</span><span class="card-note">FTE-equivalent for multi-tag employees</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Team</th><th class="r">HC</th><th class="r">Poor%</th><th class="r">Attr</th><th class="r">CAC</th><th class="r">COGS</th><th class="r">G&amp;A</th><th class="r" style="color:var(--purple)">OpEx</th><th class="r">Total FL</th></tr></thead>
+      <tbody>${teamRows||'<tr><td colspan="9" style="text-align:center;color:var(--g400);padding:20px">No team data</td></tr>'}</tbody>
+    </table></div>
+  </div>`;
+}
+function renderAttritionTab(){
+  const leaders=getLeaders();
+  const flagged=state.employees.filter(e=>e.attrition).filter(e=>{
+    if(state.attrSearch&&!e.name.toLowerCase().includes(state.attrSearch.toLowerCase()))return false;
+    if(state.attrFilterType!=='all'&&e.attrition!==state.attrFilterType)return false;
+    if(state.attrFilterOrg!=='all'&&e.leaderId!==state.attrFilterOrg)return false;
+    return true;
+  });
+  const logFiltered=state.attritionLog.filter(e=>{
+    if(state.attrSearch&&!e.name.toLowerCase().includes(state.attrSearch.toLowerCase()))return false;
+    if(state.attrFilterType!=='all'&&e.attritionType!==state.attrFilterType)return false;
+    if(state.attrFilterOrg!=='all'&&e.leaderId!==state.attrFilterOrg)return false;
+    return true;
+  });
+  const negC=state.employees.filter(e=>e.attrition==='Negative Attrition').length;
+  const posC=state.employees.filter(e=>e.attrition==='Positive Attrition').length;
+  const proC=state.employees.filter(e=>e.attrition==='Promotion Attrition').length;
+  const lNeg=state.attritionLog.filter(e=>e.attritionType==='Negative Attrition').length;
+  const lPos=state.attritionLog.filter(e=>e.attritionType==='Positive Attrition').length;
+  const lPro=state.attritionLog.filter(e=>e.attritionType==='Promotion Attrition').length;
+  const flaggedRows=flagged.map((e,i)=>{
+    const leader=leaders.find(l=>l.id===e.leaderId);
+    const tc=e.attrition==='Negative Attrition'?'bg-red':e.attrition==='Positive Attrition'?'bg-green':'bg-blue';
+    const bg=i%2===0?'#fff':'#fafafa';
+    return`<tr><td style="background:${bg};font-weight:500">${esc(e.name)}</td><td style="background:${bg};color:var(--g600);font-size:11px">${esc(e.role)}</td><td style="background:${bg};color:var(--g600);font-size:11px">${esc(leader?.label||'')}</td><td style="background:${bg}"><span class="badge ${tc}">${esc(e.attrition)}</span></td><td style="background:${bg};font-size:11px;color:var(--g600);max-width:220px">${esc(e.notes)||'--'}</td><td style="background:${bg}"><div style="display:flex;gap:4px"><button class="btn-ghost" onclick="editEmp('${e.id}')">Edit</button><button class="btn btn-sm" style="background:var(--red-bg);color:var(--red);border:none;font-size:10px;padding:3px 8px;border-radius:5px" onclick="logAttrition('${e.id}')">Log Exit</button></div></td></tr>`;
+  }).join('');
+  const logRows=logFiltered.map((entry,i)=>{
+    const leader=leaders.find(l=>l.id===entry.leaderId);
+    const tc=entry.attritionType==='Negative Attrition'?'bg-red':entry.attritionType==='Positive Attrition'?'bg-green':'bg-blue';
+    const bg=i%2===0?'#fff':'#fafafa';
+    return`<tr><td style="background:${bg};font-weight:500">${esc(entry.name)}</td><td style="background:${bg};color:var(--g600);font-size:11px">${esc(entry.role)}</td><td style="background:${bg};color:var(--g600);font-size:11px">${esc(leader?.label||entry.leaderId||'')}</td><td style="background:${bg}"><span class="badge ${tc}">${esc(entry.attritionType)}</span></td><td style="background:${bg};font-family:monospace;font-size:11px;color:var(--g600)">${esc(entry.exitDate)||'--'}</td><td style="background:${bg};font-size:11px;color:var(--g600);max-width:220px">${esc(entry.reason)||'--'}</td><td style="background:${bg}"><div style="display:flex;gap:4px"><button class="btn-ghost" onclick="editLogEntry('${entry.id}')">Edit</button><button class="btn-danger" onclick="deleteLogEntry('${entry.id}')">x</button></div></td></tr>`;
+  }).join('');
+  const orgOpts=leaders.map(l=>`<option value="${l.id}"${state.attrFilterOrg===l.id?' selected':''}>${esc(l.label)}</option>`).join('');
+  return`
+  <div class="page-header">
+    <div><div class="page-title">Attrition</div><div class="page-sub">Active flags &middot; departed employee log</div></div>
+    <button class="btn btn-primary btn-sm" onclick="showAddLogModal()">+ Log Departure</button>
+  </div>
+  <div class="stat-grid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
+    <div class="stat" style="border-top-color:var(--red)"><div class="stat-lbl">Neg (Active)</div><div class="stat-val" style="color:var(--red)">${negC}</div><div class="stat-sub">${lNeg} in log</div></div>
+    <div class="stat" style="border-top-color:var(--green)"><div class="stat-lbl">Pos (Active)</div><div class="stat-val" style="color:var(--green)">${posC}</div><div class="stat-sub">${lPos} in log</div></div>
+    <div class="stat" style="border-top-color:var(--blue)"><div class="stat-lbl">Promo (Active)</div><div class="stat-val" style="color:var(--blue)">${proC}</div><div class="stat-sub">${lPro} in log</div></div>
+    <div class="stat" style="border-top-color:var(--amber)"><div class="stat-lbl">Total Flagged</div><div class="stat-val">${negC+posC+proC}</div><div class="stat-sub">${lNeg+lPos+lPro} departed</div></div>
+  </div>
+  <div class="controls">
+    <input type="text" class="search-inp" placeholder="Search name..." value="${esc(state.attrSearch)}" oninput="setAttrSearch(this.value)">
+    <select onchange="setAttrFilterType(this.value)"><option value="all"${state.attrFilterType==='all'?' selected':''}>All Types</option>${ATTR_TYPES.filter(Boolean).map(a=>`<option value="${a}"${state.attrFilterType===a?' selected':''}>${a}</option>`).join('')}</select>
+    <select onchange="setAttrFilterOrg(this.value)"><option value="all"${state.attrFilterOrg==='all'?' selected':''}>All Orgs</option>${orgOpts}</select>
+  </div>
+  <div class="card"><div class="card-hdr"><span class="card-ttl">Active Flags (${flagged.length})</span><span class="card-note">Click "Log Exit" when they depart</span></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Employee</th><th>Role</th><th>Org</th><th>Type</th><th>Notes</th><th></th></tr></thead><tbody>${flaggedRows||'<tr><td colspan="6" style="text-align:center;color:var(--g400);padding:24px">No active flags</td></tr>'}</tbody></table></div>
+  </div>
+  <div class="card"><div class="card-hdr"><span class="card-ttl">Attrition Log (${state.attritionLog.length})</span><span class="card-note">Departed employees</span></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Org</th><th>Type</th><th>Exit Date</th><th>Reason</th><th></th></tr></thead><tbody>${logRows||'<tr><td colspan="7" style="text-align:center;color:var(--g400);padding:24px">No entries yet</td></tr>'}</tbody></table></div>
+  </div>`;
+}
+function logAttrition(empId){
+  const emp=state.employees.find(e=>e.id===empId);if(!emp)return;
+  showModal(`<div class="modal modal-sm"><div class="modal-hdr"><span class="modal-ttl">Log Exit: ${esc(emp.name)}</span><button class="modal-x" onclick="closeModal()">&times;</button></div><div class="modal-body"><p style="font-size:12px;color:var(--g600)">Moves to log and clears flag. Employee stays in roster.</p><div class="fg"><label class="flbl">Type</label><select id="log-type">${ATTR_TYPES.filter(Boolean).map(a=>`<option value="${a}"${a===emp.attrition?' selected':''}>${a}</option>`).join('')}</select></div><div class="fg"><label class="flbl">Exit Date</label><input type="date" id="log-date" value="${new Date().toISOString().slice(0,10)}"></div><div class="fg"><label class="flbl">Reason / Notes</label><textarea id="log-reason" rows="3">${esc(emp.notes||'')}</textarea></div></div><div class="modal-foot"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveLogEntry('${emp.id}')">Log Exit</button></div></div>`);
+}
+function saveLogEntry(empId){
+  const emp=state.employees.find(e=>e.id===empId);if(!emp)return;
+  state.attritionLog.unshift({id:uid(),empId,name:emp.name,role:emp.role,leaderId:emp.leaderId,attritionType:document.getElementById('log-type')?.value||emp.attrition,exitDate:document.getElementById('log-date')?.value||'',reason:document.getElementById('log-reason')?.value||'',loggedAt:new Date().toISOString()});
+  state.employees=state.employees.map(e=>e.id===empId?{...e,attrition:''}:e);
+  persist();closeModal();render();showToast('Exit logged for '+emp.name);
+}
+function showAddLogModal(){
+  const leaders=getLeaders();
+  showModal(`<div class="modal modal-sm"><div class="modal-hdr"><span class="modal-ttl">Log Departure</span><button class="modal-x" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="fg"><label class="flbl">Name *</label><input type="text" id="log-name"></div><div class="frow f2"><div class="fg"><label class="flbl">Role</label><input type="text" id="log-role"></div><div class="fg"><label class="flbl">Org</label><select id="log-org">${leaders.map(l=>`<option value="${l.id}">${esc(l.label)}</option>`).join('')}</select></div></div><div class="frow f2"><div class="fg"><label class="flbl">Type</label><select id="log-type2">${ATTR_TYPES.filter(Boolean).map(a=>`<option>${a}</option>`).join('')}</select></div><div class="fg"><label class="flbl">Exit Date</label><input type="date" id="log-date2" value="${new Date().toISOString().slice(0,10)}"></div></div><div class="fg"><label class="flbl">Reason</label><textarea id="log-reason2" rows="3"></textarea></div></div><div class="modal-foot"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveManualLog()">Log</button></div></div>`);
+}
+function saveManualLog(){
+  const name=document.getElementById('log-name')?.value?.trim();if(!name)return;
+  state.attritionLog.unshift({id:uid(),empId:null,name,role:document.getElementById('log-role')?.value||'',leaderId:document.getElementById('log-org')?.value||'',attritionType:document.getElementById('log-type2')?.value||'',exitDate:document.getElementById('log-date2')?.value||'',reason:document.getElementById('log-reason2')?.value||'',loggedAt:new Date().toISOString()});
+  persist();closeModal();render();
+}
+function editLogEntry(id){
+  const entry=state.attritionLog.find(e=>e.id===id);if(!entry)return;
+  const leaders=getLeaders();
+  showModal(`<div class="modal modal-sm"><div class="modal-hdr"><span class="modal-ttl">Edit Log Entry</span><button class="modal-x" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="fg"><label class="flbl">Name</label><input type="text" id="el-name" value="${esc(entry.name)}"></div><div class="frow f2"><div class="fg"><label class="flbl">Role</label><input type="text" id="el-role" value="${esc(entry.role)}"></div><div class="fg"><label class="flbl">Org</label><select id="el-org">${leaders.map(l=>`<option value="${l.id}"${l.id===entry.leaderId?' selected':''}>${esc(l.label)}</option>`).join('')}</select></div></div><div class="frow f2"><div class="fg"><label class="flbl">Type</label><select id="el-type">${ATTR_TYPES.filter(Boolean).map(a=>`<option value="${a}"${a===entry.attritionType?' selected':''}>${a}</option>`).join('')}</select></div><div class="fg"><label class="flbl">Exit Date</label><input type="date" id="el-date" value="${entry.exitDate||''}"></div></div><div class="fg"><label class="flbl">Reason</label><textarea id="el-reason" rows="3">${esc(entry.reason||'')}</textarea></div></div><div class="modal-foot"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditLog('${id}')">Save</button></div></div>`);
+}
+function saveEditLog(id){
+  state.attritionLog=state.attritionLog.map(e=>e.id===id?{...e,name:document.getElementById('el-name')?.value||e.name,role:document.getElementById('el-role')?.value||e.role,leaderId:document.getElementById('el-org')?.value||e.leaderId,attritionType:document.getElementById('el-type')?.value||e.attritionType,exitDate:document.getElementById('el-date')?.value||e.exitDate,reason:document.getElementById('el-reason')?.value||e.reason}:e);
+  persist();closeModal();render();
+}
+function deleteLogEntry(id){if(!confirm('Remove this entry?'))return;state.attritionLog=state.attritionLog.filter(e=>e.id!==id);persist();render();}
+function setAttrSearch(v){state.attrSearch=v;renderMain();}
+function setAttrFilterType(v){state.attrFilterType=v;renderMain();}
+function setAttrFilterOrg(v){state.attrFilterOrg=v;renderMain();}
+function renderLeaderTab(leaderId){
+  const leaders=getLeaders();
+  const leader=leaders.find(l=>l.id===leaderId);
+  if(!leader)return'<div style="padding:40px;text-align:center;color:var(--g400)">Tab not found</div>';
+  const unlocked=!!state.unlocked[leaderId];
+  const fin=calcFin();
+  const ld=fin.byLeader[leaderId]||{};
+  const totFL=(ld.CAC||0)+(ld.COGS||0)+(ld['G&A']||0)+(ld.OpEx||0);
+  const pp=ld.headcount>0?Math.round(pct(ld.poor||0,ld.headcount)):0;
+  const emps=state.employees.filter(e=>e.leaderId===leaderId).filter(e=>{
+    if(state.search&&!e.name.toLowerCase().includes(state.search.toLowerCase())&&!e.role.toLowerCase().includes(state.search.toLowerCase()))return false;
+    if(state.filterPerf!=='all'&&e.performance!==state.filterPerf)return false;
+    if(state.filterAttr!=='all'){if(state.filterAttr==='flagged'&&!e.attrition)return false;if(state.filterAttr!=='flagged'&&e.attrition!==state.filterAttr)return false;}
+    return true;
+  });
+  const relReqs=state.reqs.filter(r=>r.leaderId===leaderId);
+  const empRows=emps.map((emp,i)=>{
+    const fl=empFL(emp),mo=tenureMo(emp.startDate);
+    const pc2=emp.performance==='Good'?'bg-good':emp.performance==='Poor'?'bg-poor':emp.performance==='Kev Direct'?'bg-blue':'bg-neutral';
+    const ac=emp.attrition==='Negative Attrition'?'var(--red)':emp.attrition==='Positive Attrition'?'var(--green)':emp.attrition?'var(--amber)':'var(--g300)';
+    const bg=i%2===0?'#fff':'#fafafa';
+    const avBg=emp.onLeave?'var(--amber-bg)':'var(--ol)',avC=emp.onLeave?'var(--amber)':'var(--od)';
+    const isDL=(emp.teamTags||[]).includes(DEPT_LEADER_TAG);
+    const tagHtml=(emp.teamTags||[]).map(t=>{const cls=t===DEPT_LEADER_TAG?'bg-blue':'bg-orange';return`<span class="badge ${cls}" style="margin:1px;font-size:9px">${esc(t)}</span>`;}).join('');
+    const allocParts=[];
+    if(emp.c1&&emp.w1>0){let s=`${emp.w1}%${emp.c1}`;if(emp.t1)s+='.'+emp.t1;if(emp.ch1)s+=`(${emp.ch1})`;allocParts.push(s);}
+    if(emp.c2&&emp.w2>0){let s=`${emp.w2}%${emp.c2}`;if(emp.t2)s+='.'+emp.t2;if(emp.ch2)s+=`(${emp.ch2})`;allocParts.push(s);}
+    if(emp.c3&&emp.w3>0){let s=`${emp.w3}%${emp.c3}`;if(emp.t3)s+='.'+emp.t3;if(emp.ch3)s+=`(${emp.ch3})`;allocParts.push(s);}
+    const allocHtml=allocParts.map(p=>`<span style="font-size:10px;color:var(--g600);display:block;white-space:nowrap">${esc(p)}</span>`).join('');
+    const oteCell=unlocked?`<td class="r mono" style="background:${bg};font-size:11px">${emp.ote?fmtFull(emp.ote):'--'}</td>`:`<td class="r" style="background:${bg}"><span class="locked-cell mono" style="font-size:11px">$xxxxxx</span></td>`;
+    const flCell=unlocked?`<td class="r mono" style="background:${bg};font-size:11px;font-weight:500">${fl?fmtFull(fl):'--'}</td>`:`<td class="r" style="background:${bg}"><span class="locked-cell mono" style="font-size:11px">$xxxxxx</span></td>`;
+    return`<tr><td style="background:${bg}"><div class="emp-cell"><div class="avatar" style="background:${avBg};color:${avC}">${esc(inits(emp.name))}</div><div><div class="emp-name">${esc(emp.name)}${isDL?'<span class="badge bg-blue" style="font-size:9px;margin-left:4px">Leader</span>':''}</div>${emp.onLeave?'<div class="emp-leave">On Leave</div>':''}</div></div></td><td style="background:${bg};max-width:140px;overflow:hidden;text-overflow:ellipsis;color:var(--g600);font-size:11px">${esc(emp.role)}</td><td class="c" style="background:${bg}"><span style="background:var(--g100);border-radius:3px;padding:1px 5px;font-size:10px;font-family:monospace">L${emp.level}</span></td><td style="background:${bg};color:var(--g600);font-size:11px">${esc(emp.manager)}</td><td style="background:${bg};font-family:monospace;font-size:10px;color:var(--g600)">${tenureLbl(mo)}</td><td style="background:${bg}"><span class="badge ${pc2}">${esc(emp.performance)}</span></td><td style="background:${bg};color:${ac};font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis">${esc(emp.attrition)||'--'}</td><td style="background:${bg}">${tagHtml}</td><td style="background:${bg}">${allocHtml}</td>${oteCell}${flCell}<td style="background:${bg}">${unlocked?`<div style="display:flex;gap:3px;justify-content:flex-end"><button class="btn-ghost" onclick="editEmp('${emp.id}')">Edit</button><button class="btn-danger" onclick="deleteEmp('${emp.id}')">x</button></div>`:''}</td></tr>`;
+  }).join('');
+  const reqRows=relReqs.map((req,i)=>`<tr><td style="background:${i%2===0?'#fff':'#fafafa'};font-weight:500;color:var(--or)">${esc(req.role)}</td><td style="background:${i%2===0?'#fff':'#fafafa'};font-size:10px">${(req.teamTags||[]).map(t=>`<span class="badge bg-orange" style="font-size:9px">${esc(t)}</span>`).join(' ')}</td><td style="background:${i%2===0?'#fff':'#fafafa'};color:var(--g600);font-size:11px">${esc(req.notes)}</td><td><button class="btn-danger" onclick="deleteReq('${req.id}')">Remove</button></td></tr>`).join('');
+  return`
+  <div class="page-header">
+    <div><div class="page-title">${esc(leader.label)}</div><div class="page-sub">Kev Direct: ${esc(leader.kev)} &middot; ${ld.headcount||0} active &middot; ${ld.onLeave||0} on leave &middot; ${ld.openReqs||0} open reqs${pp>0?' &middot; '+pp+'% underperf':''} &middot; FL: ${fmtK(totFL)}</div></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="toggleUnlock('${leaderId}')">${unlocked?'Lock Salary':'Unlock Salary'}</button>
+      <button class="btn btn-secondary btn-sm" onclick="showAddReq('${leaderId}')">+ Open Req</button>
+      <button class="btn btn-primary btn-sm" onclick="showAddEmp('${leaderId}')">+ Add Employee</button>
+    </div>
+  </div>
+  ${!unlocked?`<div class="unlock-bar">OTE and cost hidden. Enter password to unlock.<input type="password" id="pw-inline-${leaderId}" placeholder="Password..." onkeydown="if(event.key==='Enter')tryUnlock('${leaderId}')"><button class="btn btn-sm btn-secondary" onclick="tryUnlock('${leaderId}')">Unlock</button></div>`:''}
+  <div class="controls">
+    <input type="text" class="search-inp" placeholder="Search name or role..." value="${esc(state.search)}" oninput="setSearch(this.value)">
+    <select onchange="setFilterPerf(this.value)"><option value="all"${state.filterPerf==='all'?' selected':''}>All Performance</option>${PERF.map(p2=>`<option value="${p2}"${state.filterPerf===p2?' selected':''}>${p2}</option>`).join('')}</select>
+    <select onchange="setFilterAttr(this.value)"><option value="all"${state.filterAttr==='all'?' selected':''}>All Attrition</option><option value="flagged"${state.filterAttr==='flagged'?' selected':''}>Any Flag</option>${ATTR_TYPES.filter(Boolean).map(a=>`<option value="${a}"${state.filterAttr===a?' selected':''}>${a}</option>`).join('')}</select>
+  </div>
+  <div class="card"><div class="tbl-wrap"><table>
+    <thead><tr><th>Employee</th><th>Role</th><th class="c">Lvl</th><th>Manager</th><th>Tenure</th><th>Perf</th><th>Attrition</th><th>Teams</th><th>Cost Alloc</th><th class="r">OTE${unlocked?'':' [locked]'}</th><th class="r">FL${unlocked?'':' [locked]'}</th><th></th></tr></thead>
+    <tbody>${empRows}</tbody>
+  </table>${emps.length===0?'<div style="padding:32px;text-align:center;color:var(--g400);font-size:13px">No employees match filters</div>':''}</div></div>
+  ${relReqs.length>0?`<div class="card"><div class="card-hdr"><span class="card-ttl">Open Reqs (${relReqs.length})</span></div><div class="tbl-wrap"><table><thead><tr><th>Role</th><th>Teams</th><th>Notes</th><th></th></tr></thead><tbody>${reqRows}</tbody></table></div></div>`:''}`;
+}
+// Password functions
+function tryUnlock(tabId){
+  const inp=document.getElementById('pw-inline-'+tabId);if(!inp)return;
+  const h=hashStr(inp.value);
+  if(h===state.passwords[tabId]||h===state.passwords.admin){state.unlocked[tabId]=true;renderMain();}
+  else{inp.style.borderColor='var(--red)';inp.value='';inp.placeholder='Wrong password';setTimeout(()=>{inp.style.borderColor='';inp.placeholder='Password...';},1500);}
+}
+function toggleUnlock(tabId){if(state.unlocked[tabId]){delete state.unlocked[tabId];renderMain();}else showPwModal(tabId);}
+function showPwModal(tabId){
+  showModal(`<div class="modal modal-sm"><div class="modal-hdr"><span class="modal-ttl">Unlock Salary Data</span><button class="modal-x" onclick="closeModal()">&times;</button></div><div class="modal-body"><p style="font-size:12px;color:var(--g600)">Enter password to reveal OTE and enable editing.</p><div class="fg"><label class="flbl">Password</label><input type="password" id="pw-modal-inp" placeholder="Enter password..." onkeydown="if(event.key==='Enter')submitPw('${tabId}')"></div><div id="pw-err" style="font-size:11px;color:var(--red);display:none">Incorrect password</div></div><div class="modal-foot"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="submitPw('${tabId}')">Unlock</button></div></div>`);
+  setTimeout(()=>document.getElementById('pw-modal-inp')?.focus(),50);
+}
+function submitPw(tabId){
+  const inp=document.getElementById('pw-modal-inp');if(!inp)return;
+  const h=hashStr(inp.value);
+  if(h===state.passwords[tabId]||h===state.passwords.admin){state.unlocked[tabId]=true;closeModal();renderMain();}
+  else{const e=document.getElementById('pw-err');if(e)e.style.display='block';inp.value='';inp.focus();}
+}
+function promptAdmin(){
+  showModal(`<div class="modal modal-sm"><div class="modal-hdr"><span class="modal-ttl">Admin Access</span><button class="modal-x" onclick="closeModal()">&times;</button></div><div class="modal-body"><p style="font-size:12px;color:var(--g600)">Settings are admin-only.</p><div class="fg"><label class="flbl">Admin Password</label><input type="password" id="admin-pw-inp" placeholder="Enter admin password..." onkeydown="if(event.key==='Enter')submitAdmin()"></div><div id="admin-pw-err" style="font-size:11px;color:var(--red);display:none">Incorrect password</div></div><div class="modal-foot"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="submitAdmin()">Enter</button></div></div>`);
+  setTimeout(()=>document.getElementById('admin-pw-inp')?.focus(),50);
+}
+function submitAdmin(){
+  const inp=document.getElementById('admin-pw-inp');if(!inp)return;
+  if(hashStr(inp.value)===state.passwords.admin){closeModal();showSettings();}
+  else{const e=document.getElementById('admin-pw-err');if(e)e.style.display='block';inp.value='';inp.focus();}
+}
+
+// Employee modal - FIX: modal only closes via X button, never on blur
+function showAddEmp(leaderId){
+  showEmpModal({id:'',leaderId,name:'',ote:'',country:'USA',role:'',level:2,manager:'',teamTags:[],startDate:'',performance:'Good',attrition:'',onLeave:false,notes:'',c1:'CAC',w1:100,t1:'',ch1:'',c2:'',w2:0,t2:'',ch2:'',c3:'',w3:0,t3:'',ch3:''},true);
+}
+function editEmp(id){const e=state.employees.find(x=>x.id===id);if(e)showEmpModal(e,false);}
+function deleteEmp(id){const e=state.employees.find(x=>x.id===id);if(e&&confirm('Remove '+e.name+'?')){state.employees=state.employees.filter(x=>x.id!==id);persist();render();}}
+
+function showEmpModal(e,isNew){
+  window._modalTags=[...(e.teamTags||[])];
+  const tagOpts=state.teamTags.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');
+  const wT=(e.w1||0)+(e.w2||0)+(e.w3||0);
+  function slot(idx,c,w,t,ch){
+    const showCh=c==='CAC';
+    return`<div style="background:var(--g100);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:5px"><div style="font-size:10px;font-weight:600;color:var(--g600);text-transform:uppercase">Slot ${idx}</div><div class="fg"><label class="flbl">Bucket</label><select id="f-c${idx}" onchange="updateWStatus();onBucketChg(${idx})"><option value="">--</option>${BUCKETS.map(b=>`<option${b===c?' selected':''}>${b}</option>`).join('')}</select></div><div class="fg"><label class="flbl">Weight %</label><input type="number" id="f-w${idx}" min="0" max="100" value="${w||0}" oninput="updateWStatus()" style="text-align:center"></div><div class="fg"><label class="flbl">Type Tag</label><select id="f-t${idx}"><option value="">-- none --</option>${state.teamTags.filter(t2=>t2!==DEPT_LEADER_TAG).map(t2=>`<option value="${esc(t2)}"${t2===t?' selected':''}>${esc(t2)}</option>`).join('')}</select></div><div class="fg" id="ch-row-${idx}" style="display:${showCh?'flex':'none'};flex-direction:column;gap:3px"><label class="flbl">Sales Channel</label><select id="f-ch${idx}">${SALE_CHANNELS.map(s=>`<option value="${s}"${s===ch?' selected':''}>${s||'-- none --'}</option>`).join('')}</select></div></div>`;
+  }
+  // KEY FIX: no onclick on overlay - modal only closeable via X or Cancel/Save buttons
+  const overlay=document.createElement('div');
+  overlay.className='modal-overlay';overlay.id='modal-overlay';
+  overlay.innerHTML=`<div class="modal">
+    <div class="modal-hdr"><span class="modal-ttl">${isNew?'Add Employee':'Edit: '+esc(e.name)}</span><button class="modal-x" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="fg"><label class="flbl">Name *</label><input type="text" id="f-name" value="${esc(e.name)}" oninput="updateWStatus()"></div>
+      <div class="frow f2"><div class="fg"><label class="flbl">OTE ($)</label><input type="number" id="f-ote" value="${e.ote||''}" placeholder="Annual"></div><div class="fg"><label class="flbl">Country</label><select id="f-country">${COUNTRIES.map(c2=>`<option${c2===e.country?' selected':''}>${c2}</option>`).join('')}</select></div></div>
+      <div class="fg"><label class="flbl">Role</label><input type="text" id="f-role" value="${esc(e.role)}"></div>
+      <div class="frow f3"><div class="fg"><label class="flbl">Level</label><input type="number" id="f-level" min="1" max="10" value="${e.level}"></div><div class="fg"><label class="flbl">Start Date</label><input type="date" id="f-startdate" value="${e.startDate||''}"></div><div class="fg"><label class="flbl">Manager</label><input type="text" id="f-manager" value="${esc(e.manager)}"></div></div>
+      <div class="frow f2"><div class="fg"><label class="flbl">Performance</label><select id="f-perf">${PERF.map(p2=>`<option${p2===e.performance?' selected':''}>${p2}</option>`).join('')}</select></div><div class="fg"><label class="flbl">Attrition Risk</label><select id="f-attr">${ATTR_TYPES.map(a=>`<option value="${esc(a)}"${a===e.attrition?' selected':''}>${a||'None'}</option>`).join('')}</select></div></div>
+      <label class="chk-lbl"><input type="checkbox" id="f-leave"${e.onLeave?' checked':''}> On Leave</label>
+      <div class="sec-hdr">Team Tags</div>
+      <div id="tag-display" style="min-height:24px">${renderTagDisplay()}</div>
+      <div style="display:flex;gap:6px"><select id="tag-select" style="flex:1">${tagOpts}</select><button type="button" class="btn btn-secondary btn-sm" onclick="addTagToForm()">Add</button></div>
+      <div class="sec-hdr">Cost Allocation <span id="w-status" class="w-status" style="color:${wT===100?'var(--green)':'var(--red)'};margin-left:8px">${wT}% / 100%</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${slot(1,e.c1||'',e.w1||0,e.t1||'',e.ch1||'')}${slot(2,e.c2||'',e.w2||0,e.t2||'',e.ch2||'')}${slot(3,e.c3||'',e.w3||0,e.t3||'',e.ch3||'')}</div>
+      <div id="w-err" style="font-size:10px;color:var(--red);display:${wT!==100?'block':'none'}">Weights must total exactly 100%</div>
+      <div class="fg"><label class="flbl">Notes</label><textarea id="f-notes" rows="2">${esc(e.notes||'')}</textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" id="emp-save-btn" onclick="saveEmp('${e.id}','${e.leaderId}',${isNew})" ${wT!==100||!e.name?'disabled':''}>${isNew?'Add Employee':'Save Changes'}</button></div>
+  </div>`;
+  // NO click-outside-to-close - user must use X or Cancel
+  document.body.appendChild(overlay);
+}
+function onBucketChg(idx){const c=document.getElementById('f-c'+idx)?.value;const row=document.getElementById('ch-row-'+idx);if(row)row.style.display=c==='CAC'?'flex':'none';if(c!=='CAC'){const ch=document.getElementById('f-ch'+idx);if(ch)ch.value='';}}
+function renderTagDisplay(){return window._modalTags&&window._modalTags.length?window._modalTags.map(t=>`<span class="team-tag">${esc(t)}<button class="rm" onclick="removeTag('${esc(t)}')" type="button">&times;</button></span>`).join(''):'<span style="font-size:11px;color:var(--g400)">No tags yet</span>';}
+function addTagToForm(){const sel=document.getElementById('tag-select');if(!sel)return;const tag=sel.value;if(!tag||(window._modalTags||[]).includes(tag)||(window._modalTags||[]).length>=3)return;(window._modalTags=window._modalTags||[]).push(tag);const d=document.getElementById('tag-display');if(d)d.innerHTML=renderTagDisplay();}
+function removeTag(tag){window._modalTags=(window._modalTags||[]).filter(t=>t!==tag);const d=document.getElementById('tag-display');if(d)d.innerHTML=renderTagDisplay();}
+function updateWStatus(){
+  const w1=parseFloat(document.getElementById('f-w1')?.value)||0,w2=parseFloat(document.getElementById('f-w2')?.value)||0,w3=parseFloat(document.getElementById('f-w3')?.value)||0,tot=w1+w2+w3;
+  const s=document.getElementById('w-status'),err=document.getElementById('w-err'),btn=document.getElementById('emp-save-btn');
+  const name=document.getElementById('f-name')?.value?.trim();
+  if(s){s.textContent=tot+'% / 100%';s.style.color=tot===100?'var(--green)':'var(--red)';}
+  if(err)err.style.display=tot!==100?'block':'none';
+  if(btn)btn.disabled=!name||tot!==100;
+}
+function saveEmp(id,leaderId,isNew){
+  const name=document.getElementById('f-name')?.value?.trim();
+  const w1=parseFloat(document.getElementById('f-w1')?.value)||0,w2=parseFloat(document.getElementById('f-w2')?.value)||0,w3=parseFloat(document.getElementById('f-w3')?.value)||0;
+  if(!name||(w1+w2+w3)!==100){updateWStatus();return;}
+  const emp={id:isNew?uid():id,leaderId,name,ote:parseFloat(document.getElementById('f-ote')?.value)||null,country:document.getElementById('f-country')?.value||'USA',role:document.getElementById('f-role')?.value||'',level:parseInt(document.getElementById('f-level')?.value)||1,manager:document.getElementById('f-manager')?.value||'',teamTags:[...(window._modalTags||[])],startDate:document.getElementById('f-startdate')?.value||'',performance:document.getElementById('f-perf')?.value||'Good',attrition:document.getElementById('f-attr')?.value||'',onLeave:document.getElementById('f-leave')?.checked||false,notes:document.getElementById('f-notes')?.value||'',
+    c1:document.getElementById('f-c1')?.value||'',w1,t1:document.getElementById('f-t1')?.value||'',ch1:document.getElementById('f-ch1')?.value||'',
+    c2:document.getElementById('f-c2')?.value||'',w2,t2:document.getElementById('f-t2')?.value||'',ch2:document.getElementById('f-ch2')?.value||'',
+    c3:document.getElementById('f-c3')?.value||'',w3,t3:document.getElementById('f-t3')?.value||'',ch3:document.getElementById('f-ch3')?.value||''};
+  if(isNew)state.employees.push(emp);else state.employees=state.employees.map(x=>x.id===id?emp:x);
+  persist();closeModal();render();
+}
+
+// Open Req Modal
+function showAddReq(leaderId){
+  window._reqTags=[];
+  const tagOpts=state.teamTags.filter(t=>t!==DEPT_LEADER_TAG).map(t=>`<option>${esc(t)}</option>`).join('');
+  showModal(`<div class="modal modal-sm"><div class="modal-hdr"><span class="modal-ttl">Add Open Req</span><button class="modal-x" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="fg"><label class="flbl">Role *</label><input type="text" id="rq-role" placeholder="e.g. Outbound AE"></div><div style="font-size:10px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:0.7px;margin-top:4px">Team Tags</div><div id="req-tag-display" style="min-height:22px"><span style="font-size:11px;color:var(--g400)">No tags</span></div><div style="display:flex;gap:6px"><select id="req-tag-sel" style="flex:1">${tagOpts}</select><button type="button" class="btn btn-secondary btn-sm" onclick="addReqTag()">Add</button></div><div class="fg"><label class="flbl">Notes</label><input type="text" id="rq-notes"></div></div><div class="modal-foot"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveReq('${leaderId}')">Add Req</button></div></div>`);
+}
+function addReqTag(){const sel=document.getElementById('req-tag-sel');if(!sel)return;const tag=sel.value;if(!tag||(window._reqTags||[]).includes(tag))return;(window._reqTags=window._reqTags||[]).push(tag);const d=document.getElementById('req-tag-display');if(d)d.innerHTML=window._reqTags.map(t=>`<span class="team-tag">${esc(t)}</span>`).join('');}
+function saveReq(leaderId){const role=document.getElementById('rq-role')?.value?.trim();if(!role)return;state.reqs.push({id:uid(),leaderId,role,teamTags:[...(window._reqTags||[])],notes:document.getElementById('rq-notes')?.value||''});persist();closeModal();render();}
+function deleteReq(id){state.reqs=state.reqs.filter(r=>r.id!==id);persist();render();}
+
+// Settings - with dynamic leader management
+function showSettings(){
+  const leaders=getLeaders();
+  const tagChips=state.teamTags.map(t=>`<span class="tag-chip">${esc(t)}<button class="rm" onclick="removeTeamTag('${esc(t)}')" type="button">&times;</button></span>`).join('');
+  const pwRows=leaders.map(l=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="flex:1;font-size:12px;font-weight:500">${esc(l.label)}</span><input type="password" placeholder="New password" id="pw-${l.id}" style="flex:1;padding:5px 8px;font-size:12px"><button class="btn btn-secondary btn-sm" onclick="saveTabPw('${l.id}')">Set</button></div>`).join('');
+  const leaderChips=state.leaders.map(l=>`<div class="leader-chip"><div><div style="font-size:12px;font-weight:500">${esc(l.label)}</div><div style="font-size:10px;color:var(--g600)">${esc(l.kev)} &middot; ID: ${esc(l.id)}</div></div><button class="rm-leader" onclick="removeLeader('${l.id}')" title="Remove tab">&times;</button></div>`).join('');
+  showModal(`<div class="modal">
+    <div class="modal-hdr"><span class="modal-ttl">Settings</span><button class="modal-x" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="settings-section">
+        <div class="settings-title">Org Tabs</div>
+        <p style="font-size:11px;color:var(--g600);margin-bottom:10px">Add new org tabs here. Each tab gets its own employee roster, password, and cost reporting.</p>
+        <div id="leader-chips-container" style="margin-bottom:12px">${leaderChips}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
+          <div class="fg"><label class="flbl">Tab Name</label><input type="text" id="new-leader-label" placeholder="e.g. RevOps"></div>
+          <div class="fg"><label class="flbl">Leader Name</label><input type="text" id="new-leader-kev" placeholder="e.g. Jane Smith"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addLeader()">Add Tab</button>
+      </div>
+      <div class="settings-section">
+        <div class="settings-title">Team Tags</div>
+        <div id="tag-chips-container" style="margin-bottom:10px">${tagChips}</div>
+        <div style="display:flex;gap:6px"><input type="text" id="new-tag-inp" placeholder="New tag..." style="flex:1" onkeydown="if(event.key==='Enter')addTeamTag()"><button class="btn btn-primary btn-sm" onclick="addTeamTag()">Add</button></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-title">Tab Passwords</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--g200)"><span style="flex:1;font-size:12px;font-weight:600;color:var(--or)">Admin (Settings)</span><input type="password" placeholder="New admin password" id="pw-admin" style="flex:1;padding:5px 8px;font-size:12px"><button class="btn btn-secondary btn-sm" onclick="saveTabPw('admin')">Set</button></div>
+        ${pwRows}
+      </div>
+      <div class="settings-section">
+        <div class="settings-title">Danger Zone</div>
+        <button class="btn btn-secondary btn-sm" onclick="if(confirm('Reset ALL data? Cannot be undone.')){localStorage.clear();location.reload();}">Reset to Seed Data</button>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-primary" onclick="closeModal()">Done</button></div>
+  </div>`);
+}
+
+function addLeader(){
+  const label=document.getElementById('new-leader-label')?.value?.trim();
+  const kev=document.getElementById('new-leader-kev')?.value?.trim();
+  if(!label||!kev){alert('Both tab name and leader name are required.');return;}
+  const id=slugify(label);
+  if(state.leaders.find(l=>l.id===id)){alert('A tab with that name already exists. Try a different name.');return;}
+  state.leaders.push({id,label,kev});
+  // Set a default password for new tab
+  state.passwords[id]=state.passwords.admin; // admin pw works on all tabs anyway
+  persist();closeModal();render();showToast('Tab "'+label+'" added');
+}
+function removeLeader(id){
+  const hasEmps=state.employees.some(e=>e.leaderId===id);
+  if(hasEmps&&!confirm('This org has employees. Remove the tab anyway? Employees will still exist but their tab will be gone.'))return;
+  if(!hasEmps&&!confirm('Remove this tab?'))return;
+  state.leaders=state.leaders.filter(l=>l.id!==id);
+  persist();
+  if(state.activeTab===id)state.activeTab='dashboard';
+  closeModal();render();
+}
+function addTeamTag(){const inp=document.getElementById('new-tag-inp');const tag=inp?.value?.trim();if(!tag||state.teamTags.includes(tag))return;state.teamTags.push(tag);persist();const c=document.getElementById('tag-chips-container');if(c)c.innerHTML=state.teamTags.map(t=>`<span class="tag-chip">${esc(t)}<button class="rm" onclick="removeTeamTag('${esc(t)}')" type="button">&times;</button></span>`).join('');if(inp)inp.value='';}
+function removeTeamTag(tag){state.teamTags=state.teamTags.filter(t=>t!==tag);persist();const c=document.getElementById('tag-chips-container');if(c)c.innerHTML=state.teamTags.map(t=>`<span class="tag-chip">${esc(t)}<button class="rm" onclick="removeTeamTag('${esc(t)}')" type="button">&times;</button></span>`).join('');}
+function saveTabPw(tabId){const inp=document.getElementById('pw-'+tabId);if(!inp||!inp.value.trim())return;state.passwords[tabId]=hashStr(inp.value.trim());persist();inp.value='';inp.placeholder='Updated';inp.style.borderColor='var(--green)';setTimeout(()=>{inp.placeholder='New password';inp.style.borderColor='';},2000);}
+
+// Export / Import
+function exportData(){
+  const data={version:4,exported:new Date().toISOString(),employees:state.employees,reqs:state.reqs,attritionLog:state.attritionLog,leaders:state.leaders,arr:state.arr,dealsTotal:state.dealsTotal,dealsInbound:state.dealsInbound,dealsOutbound:state.dealsOutbound,dealPeriod:state.dealPeriod,perDealCac:state.perDealCac,arpuAvg:state.arpuAvg,arpuInbound:state.arpuInbound,arpuOutbound:state.arpuOutbound,otherGmHitPct:state.otherGmHitPct,teamTags:state.teamTags,passwords:state.passwords};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='MoeGo_GTM_Data_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);
+}
+function importData(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        if(!data.employees||!data.reqs)throw new Error('Invalid file');
+        if(!confirm('Import from '+file.name+'?\n'+data.employees.length+' employees\nExported: '+(data.exported||'unknown')))return;
+        state.employees=(data.employees||[]).map(e=>({ch1:'',ch2:'',ch3:'',...e}));
+        state.reqs=data.reqs||[];state.attritionLog=data.attritionLog||[];
+        // Preserve custom leaders if present
+        state.leaders=data.leaders||BUILTIN_LEADERS.map(l=>({...l}));
+        state.arr=data.arr||state.arr;state.dealsTotal=data.dealsTotal||0;
+        state.dealsInbound=data.dealsInbound||0;state.dealsOutbound=data.dealsOutbound||0;
+        state.dealPeriod=data.dealPeriod||'annual';state.perDealCac=data.perDealCac||data.otherCac||0;
+        state.arpuAvg=data.arpuAvg||0;state.arpuInbound=data.arpuInbound||0;state.arpuOutbound=data.arpuOutbound||0;
+        state.otherGmHitPct=data.otherGmHitPct||0;state.teamTags=data.teamTags||state.teamTags;
+        if(!state.teamTags.includes('OpEx'))state.teamTags.push('OpEx');
+        state.passwords=Object.assign({},DEFAULT_PW,data.passwords||{});
+        state.unlocked={};persist();render();showToast('Data imported successfully');
+      }catch(err){alert('Failed to import: '+err.message);}
+    };
+    reader.readAsText(file);
+  };inp.click();
+}
+
+// Modal utilities
+function showModal(html){let ov=document.getElementById('modal-overlay');if(ov)ov.remove();ov=document.createElement('div');ov.className='modal-overlay';ov.id='modal-overlay';ov.innerHTML=html;ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});document.body.appendChild(ov);}
+function closeModal(){document.getElementById('modal-overlay')?.remove();}
+function showToast(msg){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.3);pointer-events:none';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2500);}
+function setSearch(v){state.search=v;renderMain();}
+function setFilterPerf(v){state.filterPerf=v;renderMain();}
+function setFilterAttr(v){state.filterAttr=v;renderMain();}
+
+render();
+</script>
+</body>
+</html>
